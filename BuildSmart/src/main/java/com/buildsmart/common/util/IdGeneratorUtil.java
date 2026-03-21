@@ -40,6 +40,11 @@ public final class IdGeneratorUtil {
         return String.format("PAYBS%03d", next);
     }
 
+    public static String nextNotificationId(String lastNotificationId) {
+        int next = extractNumericSuffix(lastNotificationId, 3) + 1;
+        return String.format("NOTBS%03d", next);
+    }
+
     private static int extractNumericSuffix(String id, int digits) {
         if (id == null || id.length() < digits) {
             return 0;

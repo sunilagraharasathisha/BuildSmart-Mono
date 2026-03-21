@@ -22,4 +22,12 @@ public class OpenApiConfig {
                 .pathsToMatch("/api/finance/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi notificationApis() {
+        return GroupedOpenApi.builder()
+                .group("Notification APIs")
+                .pathsToMatch("/api/notifications/**")
+                .build();
+    }
 }

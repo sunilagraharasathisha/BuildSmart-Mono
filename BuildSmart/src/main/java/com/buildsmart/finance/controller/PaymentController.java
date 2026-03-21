@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/finance/payments")
 @RequiredArgsConstructor
 @Tag(name = "Finance APIs", description = "Payment management endpoints")
+@PreAuthorize("hasAnyRole('ADMIN','FINANCE_OFFICER')")
 public class PaymentController {
 
     private final PaymentService paymentService;

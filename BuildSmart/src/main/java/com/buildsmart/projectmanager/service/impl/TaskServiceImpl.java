@@ -1,6 +1,7 @@
 package com.buildsmart.projectmanager.service.impl;
 
 import com.buildsmart.common.exception.ResourceNotFoundException;
+import com.buildsmart.common.notification.NotificationService;
 import com.buildsmart.common.util.IdGeneratorUtil;
 import com.buildsmart.projectmanager.dto.TaskRequest;
 import com.buildsmart.projectmanager.dto.TaskResponse;
@@ -23,6 +24,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final ProjectRepository projectRepository;
     private final TaskValidator taskValidator;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -44,7 +46,15 @@ public class TaskServiceImpl implements TaskService {
         task.setActualStart(request.actualStart());
         task.setActualEnd(request.actualEnd());
         task.setStatus(request.status());
-        return toResponse(taskRepository.save(task));
+        Task savedTask = taskRepository.save(task);
+        String message = String.format("You have been assigned task %s for Project %s",
+                savedTask.getTaskId(), project.getProjectId());
+        notificationService.createNotification(
+                savedTask.getAssignedTo(),
+                savedTask.getTaskId(),
+                project.getProjectId(),
+                message);
+        return toResponse(savedTask);
     }
 
     @Override

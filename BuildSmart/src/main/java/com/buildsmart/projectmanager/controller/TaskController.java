@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +19,7 @@ import java.util.List;
 @RequestMapping("/api/project-manager/tasks")
 @RequiredArgsConstructor
 @Tag(name = "Project Manager APIs", description = "Task management endpoints")
+@PreAuthorize("hasAnyRole('ADMIN','PROJECT_MANAGER','SITE_ENGINEER')")
 public class TaskController {
 
     private final TaskService taskService;
