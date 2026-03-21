@@ -1,8 +1,9 @@
 package com.buildsmart.common.enums;
 
 public enum PaymentStatus {
-    PENDING,
-    COMPLETED,
+    INITIATED,
+    PROCESSING,
+    SUCCESS,
     FAILED,
     CANCELLED
 }

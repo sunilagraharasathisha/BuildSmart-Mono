@@ -1,41 +1,16 @@
 package com.buildsmart.projectmanager.validator;
 
-import com.buildsmart.common.exception.ResourceNotFoundException;
-import com.buildsmart.projectmanager.dto.TaskRequestDto;
-import com.buildsmart.projectmanager.repository.ProjectRepository;
+import com.buildsmart.projectmanager.dto.TaskRequest;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 @Component
 public class TaskValidator {
-
-    private final ProjectRepository projectRepository;
-
-    public TaskValidator(ProjectRepository projectRepository) {
-        this.projectRepository = projectRepository;
-    }
-
-    public void validateCreate(TaskRequestDto dto) {
-        validateProjectExists(dto.getProjectId());
-        validatePlannedDates(dto.getPlannedStart(), dto.getPlannedEnd());
-    }
-
-    public void validateUpdate(TaskRequestDto dto) {
-        validateProjectExists(dto.getProjectId());
-        validatePlannedDates(dto.getPlannedStart(), dto.getPlannedEnd());
-    }
-
-    private void validateProjectExists(String projectId) {
-        if (!projectRepository.existsByProjectId(projectId)) {
-            throw new ResourceNotFoundException("Project", projectId);
+    public void validate(TaskRequest request) {
+        if (request.plannedEnd().isBefore(request.plannedStart())) {
+            throw new IllegalArgumentException("plannedEnd must be after plannedStart");
         }
-    }
-
-    private void validatePlannedDates(java.time.LocalDate plannedStart, java.time.LocalDate plannedEnd) {
-        if (plannedStart == null || plannedEnd == null) return;
-        if (plannedEnd.isBefore(plannedStart) || plannedEnd.isEqual(plannedStart)) {
-            throw new IllegalArgumentException("Planned end date must be after planned start date");
+        if (request.actualStart() != null && request.actualEnd() != null && request.actualEnd().isBefore(request.actualStart())) {
+            throw new IllegalArgumentException("actualEnd must be after actualStart");
         }
     }
 }

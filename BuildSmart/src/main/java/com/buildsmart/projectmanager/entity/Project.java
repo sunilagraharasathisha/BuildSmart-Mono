@@ -1,50 +1,40 @@
 package com.buildsmart.projectmanager.entity;
 
+import com.buildsmart.common.enums.ProjectStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Table(name = "project", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_project_id", columnNames = "project_id"),
-        @UniqueConstraint(name = "uq_project_name", columnNames = "project_name")
-})
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "projects", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_project_name", columnNames = "project_name")
+})
 public class Project {
 
     @Id
-    @Column(name = "project_id", length = 20, nullable = false, updatable = false)
+    @Column(name = "project_id", nullable = false, updatable = false, length = 20)
     private String projectId;
 
-    @Column(name = "project_name", nullable = false, unique = true, length = 150)
+    @Column(name = "project_name", nullable = false, unique = true, length = 120)
     private String projectName;
 
-    @Column(name = "start_date", nullable = false)
     private LocalDate startDate;
-
-    @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal budget;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 30)
     private ProjectStatus status;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @Builder.Default
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
-
-    public enum ProjectStatus {
-        PLANNED, IN_PROGRESS, COMPLETED, ON_HOLD, CANCELLED
-    }
 }

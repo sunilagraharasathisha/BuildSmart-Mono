@@ -1,24 +1,54 @@
 package com.buildsmart.common.util;
 
-import org.springframework.stereotype.Component;
+import com.buildsmart.common.enums.Department;
 
-/**
- * Utility for generating custom formatted IDs across the application.
- * Format: PREFIX + SEQUENCE (3 digits)
- */
-@Component
-public class IdGeneratorUtil {
+import java.time.LocalDate;
 
-    private static final int SEQUENCE_LENGTH = 3;
+public final class IdGeneratorUtil {
 
-    /**
-     * Generates the next ID in format PREFIX + zero-padded sequence.
-     *
-     * @param prefix   The prefix (e.g., CHEBS26, BUDBS, FINBS)
-     * @param nextSeq  The next sequence number
-     * @return Generated ID (e.g., CHEBS26001, BUDBS001)
-     */
-    public String generateId(String prefix, long nextSeq) {
-        return String.format("%s%0" + SEQUENCE_LENGTH + "d", prefix, nextSeq);
+    private IdGeneratorUtil() {
+    }
+
+    public static String nextProjectId(String lastProjectId) {
+        int year = LocalDate.now().getYear() % 100;
+        int next = extractNumericSuffix(lastProjectId, 3) + 1;
+        return String.format("CHEBS%02d%03d", year, next);
+    }
+
+    public static String nextTaskId(Department department, String lastTaskId) {
+        int next = extractNumericSuffix(lastTaskId, 3) + 1;
+        return switch (department) {
+            case FINANCE -> String.format("FINBS%03d", next);
+            case VENDOR -> String.format("VENBS%03d", next);
+            case SAFETY -> String.format("SAFBS%03d", next);
+            case SITE -> String.format("SITBS%03d", next);
+        };
+    }
+
+    public static String nextBudgetId(String lastBudgetId) {
+        int next = extractNumericSuffix(lastBudgetId, 3) + 1;
+        return String.format("BUDBS%03d", next);
+    }
+
+    public static String nextExpenseId(String lastExpenseId) {
+        int next = extractNumericSuffix(lastExpenseId, 3) + 1;
+        return String.format("EXPBS%03d", next);
+    }
+
+    public static String nextPaymentId(String lastPaymentId) {
+        int next = extractNumericSuffix(lastPaymentId, 3) + 1;
+        return String.format("PAYBS%03d", next);
+    }
+
+    private static int extractNumericSuffix(String id, int digits) {
+        if (id == null || id.length() < digits) {
+            return 0;
+        }
+        String suffix = id.substring(id.length() - digits);
+        try {
+            return Integer.parseInt(suffix);
+        } catch (NumberFormatException ex) {
+            return 0;
+        }
     }
 }

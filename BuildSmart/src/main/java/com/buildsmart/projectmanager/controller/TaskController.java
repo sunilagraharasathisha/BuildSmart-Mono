@@ -1,9 +1,11 @@
 package com.buildsmart.projectmanager.controller;
 
-import com.buildsmart.projectmanager.dto.TaskRequestDto;
-import com.buildsmart.projectmanager.dto.TaskResponseDto;
-import com.buildsmart.projectmanager.entity.Task;
+import com.buildsmart.projectmanager.dto.TaskRequest;
+import com.buildsmart.projectmanager.dto.TaskResponse;
 import com.buildsmart.projectmanager.service.TaskService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,43 +15,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/api/project-manager/tasks")
 @RequiredArgsConstructor
+@Tag(name = "Project Manager APIs", description = "Task management endpoints")
 public class TaskController {
 
     private final TaskService taskService;
 
     @PostMapping
-    public ResponseEntity<TaskResponseDto> createTask(@Valid @RequestBody TaskRequestDto request) {
-        TaskResponseDto created = taskService.createTask(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
-
-    @GetMapping("/{taskId}")
-    public ResponseEntity<TaskResponseDto> getTask(@PathVariable String taskId) {
-        return ResponseEntity.ok(taskService.getTaskById(taskId));
+    @Operation(summary = "Create task")
+    @ApiResponse(responseCode = "201", description = "Task created")
+    public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(request));
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<TaskResponseDto>> getTasksByProject(@PathVariable String projectId) {
-        return ResponseEntity.ok(taskService.getTasksByProject(projectId));
-    }
-
-    @PutMapping("/{taskId}")
-    public ResponseEntity<TaskResponseDto> updateTask(@PathVariable String taskId,
-                                                      @Valid @RequestBody TaskRequestDto request) {
-        return ResponseEntity.ok(taskService.updateTask(taskId, request));
-    }
-
-    @PatchMapping("/{taskId}/status")
-    public ResponseEntity<TaskResponseDto> updateTaskStatus(@PathVariable String taskId,
-                                                            @RequestParam String status) {
-        return ResponseEntity.ok(taskService.updateTaskStatus(taskId, Task.TaskStatus.valueOf(status.toUpperCase())));
-    }
-
-    @DeleteMapping("/{taskId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable String taskId) {
-        taskService.deleteTask(taskId);
-        return ResponseEntity.noContent().build();
+    @Operation(summary = "Get tasks by project ID")
+    @ApiResponse(responseCode = "200", description = "Tasks fetched")
+    public ResponseEntity<List<TaskResponse>> getTasksByProjectId(@PathVariable String projectId) {
+        return ResponseEntity.ok(taskService.getTasksByProjectId(projectId));
     }
 }

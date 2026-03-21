@@ -3,51 +3,36 @@ package com.buildsmart.finance.entity;
 import com.buildsmart.common.enums.BudgetCategory;
 import com.buildsmart.projectmanager.entity.Project;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "budget", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_budget_id", columnNames = "budget_id"),
-        @UniqueConstraint(name = "uq_budget_project_category", columnNames = {"project_id", "category"})
-}, indexes = {
-        @Index(name = "ix_budget_project", columnList = "project_id"),
-        @Index(name = "ix_budget_category", columnList = "category")
-})
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "budgets", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_budget_project_category", columnNames = {"project_id", "category"})
+})
 public class Budget {
-
     @Id
-    @Column(name = "budget_id", length = 20, nullable = false, updatable = false)
+    @Column(name = "budget_id", nullable = false, updatable = false, length = 20)
     private String budgetId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "project_id", nullable = false, foreignKey = @ForeignKey(name = "fk_budget_project"))
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 30)
     private BudgetCategory category;
 
-    @Column(name = "planned_amount", nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal plannedAmount;
 
-    @Column(name = "actual_amount", nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal actualAmount;
 
-    @Column(nullable = false, precision = 19, scale = 2)
+    @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal variance;
-
-    @PrePersist
-    @PreUpdate
-    public void calculateVariance() {
-        if (plannedAmount == null) plannedAmount = BigDecimal.ZERO;
-        if (actualAmount == null) actualAmount = BigDecimal.ZERO;
-        this.variance = plannedAmount.subtract(actualAmount);
-    }
 }

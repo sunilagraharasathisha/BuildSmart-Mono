@@ -1,22 +1,11 @@
 package com.buildsmart.projectmanager.service;
 
-import com.buildsmart.projectmanager.dto.TaskRequestDto;
-import com.buildsmart.projectmanager.dto.TaskResponseDto;
-import com.buildsmart.projectmanager.entity.Task;
+import com.buildsmart.projectmanager.dto.TaskRequest;
+import com.buildsmart.projectmanager.dto.TaskResponse;
 
 import java.util.List;
 
 public interface TaskService {
-
-    TaskResponseDto createTask(TaskRequestDto request);
-
-    TaskResponseDto getTaskById(String taskId);
-
-    List<TaskResponseDto> getTasksByProject(String projectId);
-
-    TaskResponseDto updateTask(String taskId, TaskRequestDto request);
-
-    TaskResponseDto updateTaskStatus(String taskId, Task.TaskStatus status);
-
-    void deleteTask(String taskId);
+    TaskResponse createTask(TaskRequest request);
+    List<TaskResponse> getTasksByProjectId(String projectId);
 }

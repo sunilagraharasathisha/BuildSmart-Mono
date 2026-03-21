@@ -1,7 +1,9 @@
 package com.buildsmart.common.enums;
 
 public enum ExpenseStatus {
-    PENDING,
+    DRAFT,
+    SUBMITTED,
     APPROVED,
-    REJECTED
+    REJECTED,
+    PAID
 }

@@ -1,63 +1,43 @@
 package com.buildsmart.projectmanager.entity;
 
+import com.buildsmart.common.enums.Department;
+import com.buildsmart.common.enums.TaskStatus;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "task", uniqueConstraints = {
-        @UniqueConstraint(name = "uq_task_id", columnNames = "task_id")
-})
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "tasks")
 public class Task {
 
     @Id
-    @Column(name = "task_id", length = 20, nullable = false, updatable = false)
+    @Column(name = "task_id", nullable = false, updatable = false, length = 20)
     private String taskId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "project_id", nullable = false, foreignKey = @ForeignKey(name = "fk_task_project"))
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "assigned_department", nullable = false, length = 20)
-    private AssignedDepartment assignedDepartment;
+    @Column(nullable = false, length = 20)
+    private Department assignedDepartment;
 
-    @Column(name = "assigned_to", length = 100)
+    @Column(nullable = false, length = 120)
     private String assignedTo;
 
-    @Column(length = 500)
+    @Column(nullable = false, length = 500)
     private String description;
 
-    @Column(name = "planned_start", nullable = false)
     private LocalDate plannedStart;
-
-    @Column(name = "planned_end", nullable = false)
     private LocalDate plannedEnd;
-
-    @Column(name = "actual_start")
     private LocalDate actualStart;
-
-    @Column(name = "actual_end")
     private LocalDate actualEnd;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 30)
     private TaskStatus status;
-
-    public enum AssignedDepartment {
-        FINANCE,   // FINBS001
-        VENDOR,    // VENBS001
-        SAFETY,    // SAFBS001
-        SITE       // SITBS001
-    }
-
-    public enum TaskStatus {
-        PENDING, IN_PROGRESS, COMPLETED, CANCELLED
-    }
 }

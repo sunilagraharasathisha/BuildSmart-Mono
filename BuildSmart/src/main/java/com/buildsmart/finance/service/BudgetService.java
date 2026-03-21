@@ -1,19 +1,11 @@
 package com.buildsmart.finance.service;
 
-import com.buildsmart.finance.dto.BudgetRequestDto;
-import com.buildsmart.finance.dto.BudgetResponseDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.buildsmart.finance.dto.BudgetRequest;
+import com.buildsmart.finance.dto.BudgetResponse;
+
+import java.util.List;
 
 public interface BudgetService {
-
-    BudgetResponseDto createBudget(BudgetRequestDto request);
-
-    BudgetResponseDto getBudgetById(String budgetId);
-
-    Page<BudgetResponseDto> getBudgetsByProject(String projectId, Pageable pageable);
-
-    BudgetResponseDto updateBudget(String budgetId, BudgetRequestDto request);
-
-    void deleteBudget(String budgetId);
+    BudgetResponse createBudget(BudgetRequest request);
+    List<BudgetResponse> getBudgetsByProjectId(String projectId);
 }

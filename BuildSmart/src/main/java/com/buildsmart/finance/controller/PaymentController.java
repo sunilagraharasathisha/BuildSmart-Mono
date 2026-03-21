@@ -1,57 +1,29 @@
 package com.buildsmart.finance.controller;
 
-import com.buildsmart.finance.dto.PaymentRequestDto;
-import com.buildsmart.finance.dto.PaymentResponseDto;
+import com.buildsmart.finance.dto.PaymentRequest;
+import com.buildsmart.finance.dto.PaymentResponse;
 import com.buildsmart.finance.service.PaymentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/api/finance/payments")
 @RequiredArgsConstructor
+@Tag(name = "Finance APIs", description = "Payment management endpoints")
 public class PaymentController {
 
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<PaymentResponseDto> createPayment(@Valid @RequestBody PaymentRequestDto request) {
-        PaymentResponseDto created = paymentService.createPayment(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
-
-    @GetMapping("/{paymentId}")
-    public ResponseEntity<PaymentResponseDto> getPayment(@PathVariable String paymentId) {
-        return ResponseEntity.ok(paymentService.getPaymentById(paymentId));
-    }
-
-    @GetMapping("/invoice/{invoiceId}")
-    public ResponseEntity<List<PaymentResponseDto>> getPaymentsByInvoice(@PathVariable String invoiceId) {
-        return ResponseEntity.ok(paymentService.getPaymentsByInvoice(invoiceId));
-    }
-
-    @GetMapping
-    public ResponseEntity<Page<PaymentResponseDto>> getAllPayments(
-            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
-        return ResponseEntity.ok(paymentService.getAllPayments(pageable));
-    }
-
-    @PutMapping("/{paymentId}")
-    public ResponseEntity<PaymentResponseDto> updatePayment(@PathVariable String paymentId,
-                                                            @Valid @RequestBody PaymentRequestDto request) {
-        return ResponseEntity.ok(paymentService.updatePayment(paymentId, request));
-    }
-
-    @DeleteMapping("/{paymentId}")
-    public ResponseEntity<Void> deletePayment(@PathVariable String paymentId) {
-        paymentService.deletePayment(paymentId);
-        return ResponseEntity.noContent().build();
+    @Operation(summary = "Create payment")
+    @ApiResponse(responseCode = "201", description = "Payment created")
+    public ResponseEntity<PaymentResponse> createPayment(@Valid @RequestBody PaymentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.createPayment(request));
     }
 }
