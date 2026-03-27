@@ -55,6 +55,35 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.findAll().stream().map(this::toResponse).toList();
     }
 
+    @Override
+    @Transactional
+    public ProjectResponse updateProject(String projectId, ProjectRequest request) {
+        projectValidator.validate(request);
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + projectId));
+        
+        // Check if the new project name already exists (excluding the current project)
+        if (!project.getProjectName().equalsIgnoreCase(request.projectName()) &&
+                projectRepository.existsByProjectNameIgnoreCase(request.projectName())) {
+            throw new DuplicateResourceException("Project name already exists: " + request.projectName());
+        }
+        
+        project.setProjectName(request.projectName());
+        project.setStartDate(request.startDate());
+        project.setEndDate(request.endDate());
+        project.setBudget(request.budget());
+        project.setStatus(request.status());
+        return toResponse(projectRepository.save(project));
+    }
+
+    @Override
+    @Transactional
+    public void deleteProject(String projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + projectId));
+        projectRepository.delete(project);
+    }
+
     private ProjectResponse toResponse(Project project) {
         return new ProjectResponse(
                 project.getProjectId(),

@@ -63,6 +63,36 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findByProjectProjectId(projectId).stream().map(this::toResponse).toList();
     }
 
+    @Override
+    @Transactional
+    public TaskResponse updateTask(String taskId, TaskRequest request) {
+        taskValidator.validate(request);
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found: " + taskId));
+        
+        Project project = projectRepository.findById(request.projectId())
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + request.projectId()));
+        
+        task.setProject(project);
+        task.setAssignedDepartment(request.assignedDepartment());
+        task.setAssignedTo(request.assignedTo());
+        task.setDescription(request.description());
+        task.setPlannedStart(request.plannedStart());
+        task.setPlannedEnd(request.plannedEnd());
+        task.setActualStart(request.actualStart());
+        task.setActualEnd(request.actualEnd());
+        task.setStatus(request.status());
+        return toResponse(taskRepository.save(task));
+    }
+
+    @Override
+    @Transactional
+    public void deleteTask(String taskId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found: " + taskId));
+        taskRepository.delete(task);
+    }
+
     private TaskResponse toResponse(Task task) {
         return new TaskResponse(
                 task.getTaskId(),

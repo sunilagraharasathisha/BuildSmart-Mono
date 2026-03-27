@@ -37,4 +37,19 @@ public class TaskController {
     public ResponseEntity<List<TaskResponse>> getTasksByProjectId(@PathVariable String projectId) {
         return ResponseEntity.ok(taskService.getTasksByProjectId(projectId));
     }
+
+    @PutMapping("/{taskId}")
+    @Operation(summary = "Update task")
+    @ApiResponse(responseCode = "200", description = "Task updated")
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable String taskId, @Valid @RequestBody TaskRequest request) {
+        return ResponseEntity.ok(taskService.updateTask(taskId, request));
+    }
+
+    @DeleteMapping("/{taskId}")
+    @Operation(summary = "Delete task")
+    @ApiResponse(responseCode = "204", description = "Task deleted")
+    public ResponseEntity<Void> deleteTask(@PathVariable String taskId) {
+        taskService.deleteTask(taskId);
+        return ResponseEntity.noContent().build();
+    }
 }

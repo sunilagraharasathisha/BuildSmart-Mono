@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/BuildSmart.iml" filepath="$PROJECT_DIR$/.idea/BuildSmart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BuildSmart/BuildSmart.iml" filepath="$PROJECT_DIR$/BuildSmart/BuildSmart.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/BuildSmart-Mono.iml" filepath="$PROJECT_DIR$/.idea/BuildSmart-Mono.iml" />
     </modules>
   </component>
 </project>

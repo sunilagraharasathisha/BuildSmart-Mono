@@ -9,4 +9,6 @@ public interface ProjectService {
     ProjectResponse createProject(ProjectRequest request);
     ProjectResponse getProjectById(String projectId);
     List<ProjectResponse> getAllProjects();
+    ProjectResponse updateProject(String projectId, ProjectRequest request);
+    void deleteProject(String projectId);
 }

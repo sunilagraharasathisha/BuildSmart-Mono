@@ -33,6 +33,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponse> createProject(@Valid @RequestBody ProjectRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request));
     }
+
     @GetMapping("/{projectId}")
     @Operation(summary = "Get project by ID")
     @ApiResponse(responseCode = "200", description = "Project fetched")
@@ -45,5 +46,21 @@ public class ProjectController {
     @ApiResponse(responseCode = "200", description = "Projects fetched")
     public ResponseEntity<List<ProjectResponse>> getAllProjects() {
         return ResponseEntity.ok(projectService.getAllProjects());
+    }
+
+    @PutMapping("/{projectId}")
+    @Operation(summary = "Update project")
+    @ApiResponse(responseCode = "200", description = "Project updated",
+            content = @Content(schema = @Schema(implementation = ProjectResponse.class)))
+    public ResponseEntity<ProjectResponse> updateProject(@PathVariable String projectId, @Valid @RequestBody ProjectRequest request) {
+        return ResponseEntity.ok(projectService.updateProject(projectId, request));
+    }
+
+    @DeleteMapping("/{projectId}")
+    @Operation(summary = "Delete project")
+    @ApiResponse(responseCode = "204", description = "Project deleted")
+    public ResponseEntity<Void> deleteProject(@PathVariable String projectId) {
+        projectService.deleteProject(projectId);
+        return ResponseEntity.noContent().build();
     }
 }
