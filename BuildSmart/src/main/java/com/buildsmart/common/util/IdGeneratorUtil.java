@@ -87,4 +87,38 @@ public final class IdGeneratorUtil {
         return String.format("INVBS%03d", next);
 
     }
+
+    public static String nextResourceId(String lastResourceId) {
+        int next = extractNumericSuffix(lastResourceId, 3) + 1;
+        return String.format("RESBS%03d", next);
+    }
+
+    /** e.g. ALCBS001, ALCBS002 */
+    public static String nextAllocationId(String lastAllocationId) {
+        int next = extractNumericSuffix(lastAllocationId, 3) + 1;
+        return String.format("ALCBS%03d", next);
+    }
+
+    /* ─── New generators for SiteOps module ─── */
+
+    /** e.g. LOGBS001, LOGBS002 */
+    public static String nextSiteLogId(String lastSiteLogId) {
+        int next = extractNumericSuffix(lastSiteLogId, 3) + 1;
+        return String.format("LOGBS%03d", next);
+    }
+
+    /** e.g. ISSBS001, ISSBS002 */
+    public static String nextIssueId(String lastIssueId) {
+        int next = extractNumericSuffix(lastIssueId, 3) + 1;
+        return String.format("ISSBS%03d", next);
+    }
+
+    /** e.g. RREBS001, RREBS002 — SiteOps ResourceRequest IDs */
+    public static String nextResourceRequestId(String lastResourceRequestId) {
+        int next = extractNumericSuffix(lastResourceRequestId, 3) + 1;
+        return String.format("RREBS%03d", next);
+    }
+
+
 }
+

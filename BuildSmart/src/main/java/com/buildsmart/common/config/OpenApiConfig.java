@@ -97,4 +97,20 @@ public class OpenApiConfig {
                 .pathsToMatch("/api/vendors/**", "/api/vendor/invoices/**", "/api/contracts/**", "/api/deliveries/**")
                 .build();
     }
+
+    @Bean
+    public GroupedOpenApi resourceApis() {
+        return GroupedOpenApi.builder()
+                .group("Resource Allocation")
+                .pathsToMatch("/api/resources/**", "/api/allocations/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi siteOpsApis() {
+        return GroupedOpenApi.builder()
+                .group("Site Operations")
+                .pathsToMatch("/api/sitelogs/**", "/api/issues/**", "/api/resource-requests/**")
+                .build();
+    }
 }
