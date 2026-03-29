@@ -14,4 +14,6 @@ public interface BudgetService {
     BudgetResponse updateBudget(String budgetId, BudgetRequest request);
 
     void deleteBudget(String budgetId);
+
+    void validatePlannedBudget(String projectId, java.math.BigDecimal plannedAmount);
 }

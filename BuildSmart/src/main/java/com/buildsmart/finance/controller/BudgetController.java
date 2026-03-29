@@ -28,6 +28,7 @@ public class BudgetController {
     @Operation(summary = "Create budget")
     @ApiResponse(responseCode = "201", description = "Budget created")
     public ResponseEntity<BudgetResponse> createBudget(@Valid @RequestBody BudgetRequest request) {
+        budgetService.validatePlannedBudget(request.projectId(), request.plannedAmount());
         return ResponseEntity.status(HttpStatus.CREATED).body(budgetService.createBudget(request));
     }
 
