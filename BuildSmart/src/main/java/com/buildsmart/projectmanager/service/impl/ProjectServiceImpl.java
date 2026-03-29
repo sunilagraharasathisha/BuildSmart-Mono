@@ -3,6 +3,9 @@ package com.buildsmart.projectmanager.service.impl;
 import com.buildsmart.common.exception.DuplicateResourceException;
 import com.buildsmart.common.exception.ResourceNotFoundException;
 import com.buildsmart.common.util.IdGeneratorUtil;
+import com.buildsmart.finance.entity.Expense;
+import com.buildsmart.common.enums.ExpenseStatus;
+import com.buildsmart.finance.repository.ExpenseRepository;
 import com.buildsmart.projectmanager.dto.ProjectRequest;
 import com.buildsmart.projectmanager.dto.ProjectResponse;
 import com.buildsmart.projectmanager.entity.Project;
@@ -20,6 +23,7 @@ import java.util.List;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ExpenseRepository expenseRepository;
     private final ProjectValidator projectValidator;
 
     @Override
@@ -61,13 +65,13 @@ public class ProjectServiceImpl implements ProjectService {
         projectValidator.validate(request);
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + projectId));
-        
+
         // Check if the new project name already exists (excluding the current project)
         if (!project.getProjectName().equalsIgnoreCase(request.projectName()) &&
                 projectRepository.existsByProjectNameIgnoreCase(request.projectName())) {
             throw new DuplicateResourceException("Project name already exists: " + request.projectName());
         }
-        
+
         project.setProjectName(request.projectName());
         project.setStartDate(request.startDate());
         project.setEndDate(request.endDate());
@@ -84,6 +88,58 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.delete(project);
     }
 
+    @Override
+    @Transactional
+    public com.buildsmart.finance.dto.ExpenseResponse approveExpense(String expenseId, String approvedBy) {
+        Expense expense = expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found: " + expenseId));
+
+        if (expense.getStatus() == ExpenseStatus.APPROVED) {
+            throw new IllegalStateException("Expense already approved.");
+        }
+        if (expense.getStatus() == ExpenseStatus.REJECTED) {
+            throw new IllegalStateException("Cannot approve a rejected expense.");
+        }
+
+        expense.setStatus(ExpenseStatus.APPROVED);
+        expense.setApprovedBy(approvedBy);
+
+        Expense saved = expenseRepository.save(expense);
+        return new com.buildsmart.finance.dto.ExpenseResponse(
+                saved.getExpenseId(),
+                saved.getProject().getProjectId(),
+                saved.getDescription(),
+                saved.getDate(),
+                saved.getApprovedBy(),
+                saved.getStatus());
+    }
+
+    @Override
+    @Transactional
+    public com.buildsmart.finance.dto.ExpenseResponse rejectExpense(String expenseId, String approvedBy) {
+        Expense expense = expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found: " + expenseId));
+
+        if (expense.getStatus() == ExpenseStatus.APPROVED) {
+            throw new IllegalStateException("Cannot reject an approved expense.");
+        }
+        if (expense.getStatus() == ExpenseStatus.REJECTED) {
+            throw new IllegalStateException("Expense already rejected.");
+        }
+
+        expense.setStatus(ExpenseStatus.REJECTED);
+        expense.setApprovedBy(approvedBy);
+
+        Expense saved = expenseRepository.save(expense);
+        return new com.buildsmart.finance.dto.ExpenseResponse(
+                saved.getExpenseId(),
+                saved.getProject().getProjectId(),
+                saved.getDescription(),
+                saved.getDate(),
+                saved.getApprovedBy(),
+                saved.getStatus());
+    }
+
     private ProjectResponse toResponse(Project project) {
         return new ProjectResponse(
                 project.getProjectId(),
@@ -91,7 +147,6 @@ public class ProjectServiceImpl implements ProjectService {
                 project.getStartDate(),
                 project.getEndDate(),
                 project.getBudget(),
-                project.getStatus()
-        );
+                project.getStatus());
     }
 }

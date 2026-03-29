@@ -31,9 +31,6 @@ public class Project {
     @Column(nullable = false, precision = 18, scale = 2)
     private BigDecimal budget;
 
-    @Column(name = "project_manager_id", length = 50)
-    private String projectManagerId;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private ProjectStatus status;

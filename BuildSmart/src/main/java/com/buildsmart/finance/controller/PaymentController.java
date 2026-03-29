@@ -28,4 +28,11 @@ public class PaymentController {
     public ResponseEntity<PaymentResponse> createPayment(@Valid @RequestBody PaymentRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.createPayment(request));
     }
+
+    @GetMapping("/invoice/{invoiceId}/amount")
+    @Operation(summary = "Get invoice amount by invoice ID")
+    @ApiResponse(responseCode = "200", description = "Invoice amount fetched")
+    public ResponseEntity<java.math.BigDecimal> getInvoiceAmount(@PathVariable String invoiceId) {
+        return ResponseEntity.ok(paymentService.getInvoiceAmount(invoiceId));
+    }
 }

@@ -54,18 +54,4 @@ public class ExpenseController {
         expenseService.deleteExpense(expenseId);
         return ResponseEntity.noContent().build();
     }
-
-    @PostMapping("/{expenseId}/approve")
-    @Operation(summary = "Approve expense")
-    @ApiResponse(responseCode = "200", description = "Expense approved")
-    public ResponseEntity<ExpenseResponse> approveExpense(@PathVariable String expenseId) {
-        return ResponseEntity.ok(expenseService.approveExpense(expenseId));
-    }
-
-    @PostMapping("/{expenseId}/reject")
-    @Operation(summary = "Reject expense")
-    @ApiResponse(responseCode = "200", description = "Expense rejected")
-    public ResponseEntity<ExpenseResponse> rejectExpense(@PathVariable String expenseId) {
-        return ResponseEntity.ok(expenseService.rejectExpense(expenseId));
-    }
 }

@@ -66,4 +66,15 @@ public class PaymentServiceImpl implements PaymentService {
         return new PaymentResponse(saved.getPaymentId(), saved.getInvoiceId(), saved.getAmount(), saved.getDate(),
                 saved.getStatus());
     }
+
+    @Override
+    public java.math.BigDecimal getInvoiceAmount(String invoiceId) {
+        if (invoiceId == null || invoiceId.isBlank()) {
+            throw new IllegalArgumentException("Invalid or missing invoice ID.");
+        }
+
+        var invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid or missing invoice ID."));
+        return invoice.getAmount();
+    }
 }
