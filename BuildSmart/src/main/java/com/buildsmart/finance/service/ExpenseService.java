@@ -14,4 +14,8 @@ public interface ExpenseService {
     ExpenseResponse updateExpense(String expenseId, ExpenseRequest request);
 
     void deleteExpense(String expenseId);
+
+    ExpenseResponse approveExpense(String expenseId);
+
+    ExpenseResponse rejectExpense(String expenseId);
 }

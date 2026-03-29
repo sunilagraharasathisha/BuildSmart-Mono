@@ -35,14 +35,17 @@ public class BudgetServiceImpl implements BudgetService {
         Project project = projectRepository.findById(request.projectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + request.projectId()));
         if (budgetRepository.existsByProjectProjectIdAndCategory(request.projectId(), request.category())) {
-            throw new DuplicateResourceException("Budget category already exists for this project: " + request.category());
+            throw new DuplicateResourceException(
+                    "Budget category already exists for this project: " + request.category());
         }
 
+        if (request.plannedAmount().compareTo(project.getBudget()) > 0) {
+            throw new IllegalArgumentException("Planned budget exceeds project budget.");
+        }
 
-        BigDecimal actualAmount =
-                request.actualAmount() != null
-                        ? request.actualAmount()
-                        :BigDecimal.ZERO;
+        BigDecimal actualAmount = request.actualAmount() != null
+                ? request.actualAmount()
+                : BigDecimal.ZERO;
 
         Budget last = budgetRepository.findTopByOrderByBudgetIdDesc();
         Budget budget = new Budget();
@@ -52,6 +55,7 @@ public class BudgetServiceImpl implements BudgetService {
         budget.setPlannedAmount(request.plannedAmount());
         budget.setActualAmount(actualAmount);
         budget.setVariance(actualAmount.subtract(request.plannedAmount()));
+        // status computed via entity setter
         return toResponse(budgetRepository.save(budget));
     }
 
@@ -68,8 +72,8 @@ public class BudgetServiceImpl implements BudgetService {
                 budget.getCategory(),
                 budget.getPlannedAmount(),
                 budget.getActualAmount(),
-                budget.getVariance()
-        );
+                budget.getVariance(),
+                budget.getStatus());
     }
 
     @Override
@@ -82,10 +86,13 @@ public class BudgetServiceImpl implements BudgetService {
         Budget budget = budgetRepository.findById(budgetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Budget not found: " + budgetId));
 
-        BigDecimal actualAmount =
-                request.actualAmount() != null
-                        ? request.actualAmount()
-                        : BigDecimal.ZERO;
+        BigDecimal actualAmount = request.actualAmount() != null
+                ? request.actualAmount()
+                : BigDecimal.ZERO;
+
+        if (request.plannedAmount().compareTo(budget.getProject().getBudget()) > 0) {
+            throw new IllegalArgumentException("Planned budget exceeds project budget.");
+        }
 
         budget.setCategory(request.category());
         budget.setPlannedAmount(request.plannedAmount());
@@ -104,5 +111,14 @@ public class BudgetServiceImpl implements BudgetService {
                 .orElseThrow(() -> new ResourceNotFoundException("Budget not found: " + budgetId));
 
         budgetRepository.delete(budget);
+    }
+
+    @Override
+    public void validatePlannedBudget(String projectId, java.math.BigDecimal plannedAmount) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + projectId));
+        if (plannedAmount.compareTo(project.getBudget()) > 0) {
+            throw new IllegalArgumentException("Planned budget exceeds project budget.");
+        }
     }
 }

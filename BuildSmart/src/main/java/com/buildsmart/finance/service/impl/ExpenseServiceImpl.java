@@ -1,6 +1,7 @@
 package com.buildsmart.finance.service.impl;
 
 import com.buildsmart.common.exception.ResourceNotFoundException;
+import com.buildsmart.common.loggers.ApplicationLogger;
 import com.buildsmart.common.util.IdGeneratorUtil;
 import com.buildsmart.finance.dto.ExpenseRequest;
 import com.buildsmart.finance.dto.ExpenseResponse;
@@ -30,6 +31,12 @@ public class ExpenseServiceImpl implements ExpenseService {
         expenseValidator.validate(request);
         Project project = projectRepository.findById(request.projectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + request.projectId()));
+
+        if (project.getStartDate() != null && request.date().isBefore(project.getStartDate()) ||
+                project.getEndDate() != null && request.date().isAfter(project.getEndDate())) {
+            throw new IllegalArgumentException("Expense date must be within project duration.");
+        }
+
         Expense last = expenseRepository.findTopByOrderByExpenseIdDesc();
         Expense expense = new Expense();
         expense.setExpenseId(IdGeneratorUtil.nextExpenseId(last == null ? null : last.getExpenseId()));
@@ -37,7 +44,11 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setDescription(request.description());
         expense.setDate(request.date());
         expense.setApprovedBy(request.approvedBy());
-        expense.setStatus(request.status());
+        expense.setStatus(com.buildsmart.common.enums.ExpenseStatus.PENDING);
+
+        String pmId = project.getProjectManagerId();
+        ApplicationLogger.log.info("Notifying project manager {} for expense {}", pmId, expense.getExpenseId());
+
         return toResponse(expenseRepository.save(expense));
     }
 
@@ -47,8 +58,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
         if (!projectRepository.existsById(projectId)) {
             throw new ResourceNotFoundException(
-                    "Project not found: " + projectId
-            );
+                    "Project not found: " + projectId);
         }
 
         return expenseRepository.findByProjectProjectId(projectId)
@@ -64,8 +74,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 expense.getDescription(),
                 expense.getDate(),
                 expense.getApprovedBy(),
-                expense.getStatus()
-        );
+                expense.getStatus());
     }
 
     @Override
@@ -94,5 +103,23 @@ public class ExpenseServiceImpl implements ExpenseService {
                         "Expense not found: " + expenseId));
 
         expenseRepository.delete(expense);
+    }
+
+    @Override
+    @Transactional
+    public ExpenseResponse approveExpense(String expenseId) {
+        Expense expense = expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found: " + expenseId));
+        expense.setStatus(com.buildsmart.common.enums.ExpenseStatus.APPROVED);
+        return toResponse(expenseRepository.save(expense));
+    }
+
+    @Override
+    @Transactional
+    public ExpenseResponse rejectExpense(String expenseId) {
+        Expense expense = expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Expense not found: " + expenseId));
+        expense.setStatus(com.buildsmart.common.enums.ExpenseStatus.REJECTED);
+        return toResponse(expenseRepository.save(expense));
     }
 }
