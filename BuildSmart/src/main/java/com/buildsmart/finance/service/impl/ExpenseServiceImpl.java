@@ -43,7 +43,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setProject(project);
         expense.setDescription(request.description());
         expense.setDate(request.date());
-        expense.setApprovedBy(request.approvedBy());
+        expense.setApprovedBy("SYSTEM"); // Default value since it comes from project manager
         expense.setStatus(com.buildsmart.common.enums.ExpenseStatus.PENDING);
 
         ApplicationLogger.log.info("Project {} created a pending expense {}", project.getProjectId(),
@@ -86,10 +86,9 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Expense not found: " + expenseId));
 
+        // Only allow updating description, not projectId or date
         expense.setDescription(request.description());
-        expense.setDate(request.date());
-        expense.setApprovedBy(request.approvedBy());
-        expense.setStatus(request.status());
+        // Keep existing approvedBy and status
 
         return toResponse(expenseRepository.save(expense));
     }

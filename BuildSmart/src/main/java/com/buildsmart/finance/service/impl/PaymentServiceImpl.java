@@ -41,7 +41,7 @@ public class PaymentServiceImpl implements PaymentService {
                         request.invoiceId(), PaymentStatus.SUCCESS)) {
 
             throw new DuplicateResourceException(
-                    "Payment already completed for invoice: " + request.invoiceId());
+                    "Payment already exists for this invoice");
         }
 
         Payment last = paymentRepository.findTopByOrderByPaymentIdDesc();

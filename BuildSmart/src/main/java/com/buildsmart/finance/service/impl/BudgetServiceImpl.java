@@ -39,8 +39,19 @@ public class BudgetServiceImpl implements BudgetService {
                     "Budget category already exists for this project: " + request.category());
         }
 
-        if (request.plannedAmount().compareTo(project.getBudget()) > 0) {
-            throw new IllegalArgumentException("Planned budget exceeds project budget.");
+        // Check total budget sum for the project
+        BigDecimal existingBudgetsSum = budgetRepository.findByProjectProjectId(request.projectId())
+                .stream()
+                .map(Budget::getPlannedAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal newTotal = existingBudgetsSum.add(request.plannedAmount());
+
+        if (newTotal.compareTo(project.getBudget()) > 0) {
+            // Allow creation but log warning
+            ApplicationLogger.log.warn(
+                    "Total planned budget for project {} exceeds project budget. Total: {}, Project Budget: {}",
+                    request.projectId(), newTotal, project.getBudget());
         }
 
         BigDecimal actualAmount = request.actualAmount() != null
@@ -86,13 +97,25 @@ public class BudgetServiceImpl implements BudgetService {
         Budget budget = budgetRepository.findById(budgetId)
                 .orElseThrow(() -> new ResourceNotFoundException("Budget not found: " + budgetId));
 
+        // Check total budget sum for the project excluding current budget
+        BigDecimal existingBudgetsSum = budgetRepository.findByProjectProjectId(budget.getProject().getProjectId())
+                .stream()
+                .filter(b -> !b.getBudgetId().equals(budgetId))
+                .map(Budget::getPlannedAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal newTotal = existingBudgetsSum.add(request.plannedAmount());
+
+        if (newTotal.compareTo(budget.getProject().getBudget()) > 0) {
+            // Allow update but log warning
+            ApplicationLogger.log.warn(
+                    "Total planned budget for project {} exceeds project budget after update. Total: {}, Project Budget: {}",
+                    budget.getProject().getProjectId(), newTotal, budget.getProject().getBudget());
+        }
+
         BigDecimal actualAmount = request.actualAmount() != null
                 ? request.actualAmount()
                 : BigDecimal.ZERO;
-
-        if (request.plannedAmount().compareTo(budget.getProject().getBudget()) > 0) {
-            throw new IllegalArgumentException("Planned budget exceeds project budget.");
-        }
 
         budget.setCategory(request.category());
         budget.setPlannedAmount(request.plannedAmount());
@@ -117,8 +140,20 @@ public class BudgetServiceImpl implements BudgetService {
     public void validatePlannedBudget(String projectId, java.math.BigDecimal plannedAmount) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + projectId));
-        if (plannedAmount.compareTo(project.getBudget()) > 0) {
-            throw new IllegalArgumentException("Planned budget exceeds project budget.");
+
+        // Check total budget sum for the project
+        BigDecimal existingBudgetsSum = budgetRepository.findByProjectProjectId(projectId)
+                .stream()
+                .map(Budget::getPlannedAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal newTotal = existingBudgetsSum.add(plannedAmount);
+
+        if (newTotal.compareTo(project.getBudget()) > 0) {
+            // Allow but log warning
+            ApplicationLogger.log.warn(
+                    "Total planned budget for project {} would exceed project budget. Total: {}, Project Budget: {}",
+                    projectId, newTotal, project.getBudget());
         }
     }
 }

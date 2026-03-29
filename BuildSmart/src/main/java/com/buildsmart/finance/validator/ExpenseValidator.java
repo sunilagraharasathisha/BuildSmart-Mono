@@ -1,5 +1,6 @@
 package com.buildsmart.finance.validator;
 
+import com.buildsmart.common.loggers.ApplicationLogger;
 import com.buildsmart.finance.dto.ExpenseRequest;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +18,13 @@ public class ExpenseValidator {
                 .filter(s -> !s.isBlank())
                 .count();
 
-        if (wordCount == 0) {
-            throw new IllegalArgumentException("Expense description is required");
+        if (wordCount < 20) {
+            throw new IllegalArgumentException("Expense description must be at least 20 words");
         }
 
         if (wordCount > 20) {
-            throw new IllegalArgumentException("Description exceeds allowed word limit.");
+            // Allow but warn
+            ApplicationLogger.log.warn("Description exceeds 20 words ({} words)", wordCount);
         }
     }
 }
