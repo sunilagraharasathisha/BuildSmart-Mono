@@ -28,8 +28,7 @@ public class ProjectController {
 
     @PostMapping
     @Operation(summary = "Create project")
-    @ApiResponse(responseCode = "201", description = "Project created",
-            content = @Content(schema = @Schema(implementation = ProjectResponse.class)))
+    @ApiResponse(responseCode = "201", description = "Project created", content = @Content(schema = @Schema(implementation = ProjectResponse.class)))
     public ResponseEntity<ProjectResponse> createProject(@Valid @RequestBody ProjectRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(projectService.createProject(request));
     }
@@ -50,9 +49,9 @@ public class ProjectController {
 
     @PutMapping("/{projectId}")
     @Operation(summary = "Update project")
-    @ApiResponse(responseCode = "200", description = "Project updated",
-            content = @Content(schema = @Schema(implementation = ProjectResponse.class)))
-    public ResponseEntity<ProjectResponse> updateProject(@PathVariable String projectId, @Valid @RequestBody ProjectRequest request) {
+    @ApiResponse(responseCode = "200", description = "Project updated", content = @Content(schema = @Schema(implementation = ProjectResponse.class)))
+    public ResponseEntity<ProjectResponse> updateProject(@PathVariable String projectId,
+            @Valid @RequestBody ProjectRequest request) {
         return ResponseEntity.ok(projectService.updateProject(projectId, request));
     }
 
@@ -62,5 +61,23 @@ public class ProjectController {
     public ResponseEntity<Void> deleteProject(@PathVariable String projectId) {
         projectService.deleteProject(projectId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/expenses/{expenseId}/approve")
+    @Operation(summary = "Project manager approves expense")
+    @ApiResponse(responseCode = "200", description = "Expense approved")
+    public ResponseEntity<com.buildsmart.finance.dto.ExpenseResponse> approveExpense(
+            @PathVariable String expenseId,
+            @RequestParam String approvedBy) {
+        return ResponseEntity.ok(projectService.approveExpense(expenseId, approvedBy));
+    }
+
+    @PostMapping("/expenses/{expenseId}/reject")
+    @Operation(summary = "Project manager rejects expense")
+    @ApiResponse(responseCode = "200", description = "Expense rejected")
+    public ResponseEntity<com.buildsmart.finance.dto.ExpenseResponse> rejectExpense(
+            @PathVariable String expenseId,
+            @RequestParam String approvedBy) {
+        return ResponseEntity.ok(projectService.rejectExpense(expenseId, approvedBy));
     }
 }

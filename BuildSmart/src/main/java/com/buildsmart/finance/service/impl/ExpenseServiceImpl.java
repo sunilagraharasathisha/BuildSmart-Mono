@@ -46,8 +46,8 @@ public class ExpenseServiceImpl implements ExpenseService {
         expense.setApprovedBy(request.approvedBy());
         expense.setStatus(com.buildsmart.common.enums.ExpenseStatus.PENDING);
 
-        String pmId = project.getProjectManagerId();
-        ApplicationLogger.log.info("Notifying project manager {} for expense {}", pmId, expense.getExpenseId());
+        ApplicationLogger.log.info("Project {} created a pending expense {}", project.getProjectId(),
+                expense.getExpenseId());
 
         return toResponse(expenseRepository.save(expense));
     }
@@ -105,21 +105,4 @@ public class ExpenseServiceImpl implements ExpenseService {
         expenseRepository.delete(expense);
     }
 
-    @Override
-    @Transactional
-    public ExpenseResponse approveExpense(String expenseId) {
-        Expense expense = expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Expense not found: " + expenseId));
-        expense.setStatus(com.buildsmart.common.enums.ExpenseStatus.APPROVED);
-        return toResponse(expenseRepository.save(expense));
-    }
-
-    @Override
-    @Transactional
-    public ExpenseResponse rejectExpense(String expenseId) {
-        Expense expense = expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Expense not found: " + expenseId));
-        expense.setStatus(com.buildsmart.common.enums.ExpenseStatus.REJECTED);
-        return toResponse(expenseRepository.save(expense));
-    }
 }

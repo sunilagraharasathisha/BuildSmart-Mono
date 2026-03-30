@@ -69,10 +69,9 @@ public class TaskServiceImpl implements TaskService {
         taskValidator.validate(request);
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResourceNotFoundException("Task not found: " + taskId));
-        
         Project project = projectRepository.findById(request.projectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + request.projectId()));
-        
+
         task.setProject(project);
         task.setAssignedDepartment(request.assignedDepartment());
         task.setAssignedTo(request.assignedTo());
@@ -82,7 +81,9 @@ public class TaskServiceImpl implements TaskService {
         task.setActualStart(request.actualStart());
         task.setActualEnd(request.actualEnd());
         task.setStatus(request.status());
-        return toResponse(taskRepository.save(task));
+
+        Task updatedTask = taskRepository.save(task);
+        return toResponse(updatedTask);
     }
 
     @Override

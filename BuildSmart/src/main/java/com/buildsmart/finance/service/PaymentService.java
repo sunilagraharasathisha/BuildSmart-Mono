@@ -5,4 +5,6 @@ import com.buildsmart.finance.dto.PaymentResponse;
 
 public interface PaymentService {
     PaymentResponse createPayment(PaymentRequest request);
+
+    java.math.BigDecimal getInvoiceAmount(String invoiceId);
 }

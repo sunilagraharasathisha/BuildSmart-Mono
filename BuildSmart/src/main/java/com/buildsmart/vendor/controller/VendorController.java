@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/api/vendors")
 @RequiredArgsConstructor
 @Tag(name = "Vendor APIs", description = "Vendor management endpoints")
-@PreAuthorize("hasAnyRole('ADMIN','PROCUREMENT_OFFICER')")
+@PreAuthorize("hasAnyRole('ADMIN','VENDOR')")
 public class VendorController {
 
     private final VendorService vendorService;
