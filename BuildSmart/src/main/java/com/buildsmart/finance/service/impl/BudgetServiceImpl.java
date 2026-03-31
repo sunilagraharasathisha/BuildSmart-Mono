@@ -34,7 +34,7 @@ public class BudgetServiceImpl implements BudgetService {
         budgetValidator.validate(request);
         Project project = projectRepository.findById(request.projectId())
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found: " + request.projectId()));
-        if (budgetRepository.existsByProjectProjectIdAndCategory(request.projectId(), request.category())) {
+        if (budgetRepository.existsByProject_ProjectIdAndCategory(request.projectId(), request.category())) {
             throw new DuplicateResourceException(
                     "Budget category already exists for this project: " + request.category());
         }
@@ -55,14 +55,13 @@ public class BudgetServiceImpl implements BudgetService {
         budget.setPlannedAmount(request.plannedAmount());
         budget.setActualAmount(actualAmount);
         budget.setVariance(actualAmount.subtract(request.plannedAmount()));
-        // status computed via entity setter
         return toResponse(budgetRepository.save(budget));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<BudgetResponse> getBudgetsByProjectId(String projectId) {
-        return budgetRepository.findByProjectProjectId(projectId).stream().map(this::toResponse).toList();
+        return budgetRepository.findByProject_ProjectId(projectId).stream().map(this::toResponse).toList();
     }
 
     private BudgetResponse toResponse(Budget budget) {

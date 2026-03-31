@@ -56,7 +56,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (request.status() == PaymentStatus.SUCCESS && invoice.getContract() != null) {
             var project = invoice.getContract().getProject();
             if (project != null) {
-                budgetRepository.findByProjectProjectId(project.getProjectId()).forEach(budget -> {
+                budgetRepository.findByProject_ProjectId(project.getProjectId()).forEach(budget -> {
                     budget.setActualAmount(budget.getActualAmount().add(request.amount()));
                     budgetRepository.save(budget);
                 });

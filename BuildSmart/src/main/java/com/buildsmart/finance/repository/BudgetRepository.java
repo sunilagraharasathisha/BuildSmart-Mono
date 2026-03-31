@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface BudgetRepository extends JpaRepository<Budget, String> {
     Budget findTopByOrderByBudgetIdDesc();
-    boolean existsByProjectProjectIdAndCategory(String projectId, BudgetCategory category);
-    List<Budget> findByProjectProjectId(String projectId);
+    boolean existsByProject_ProjectIdAndCategory(String projectId, BudgetCategory category);
+    List<Budget> findByProject_ProjectId(String projectId);
 }

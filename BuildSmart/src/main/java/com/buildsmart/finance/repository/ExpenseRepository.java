@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ExpenseRepository extends JpaRepository<Expense, String> {
     Expense findTopByOrderByExpenseIdDesc();
-    List<Expense> findByProjectProjectId(String projectId);
+    List<Expense> findByProject_ProjectId(String projectId);
 }

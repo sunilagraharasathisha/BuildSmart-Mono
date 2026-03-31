@@ -61,7 +61,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                     "Project not found: " + projectId);
         }
 
-        return expenseRepository.findByProjectProjectId(projectId)
+        return expenseRepository.findByProject_ProjectId(projectId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
