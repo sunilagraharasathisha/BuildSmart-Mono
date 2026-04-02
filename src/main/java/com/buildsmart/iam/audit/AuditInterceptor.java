@@ -27,7 +27,6 @@ public class AuditInterceptor implements HandlerInterceptor {
     
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // Store request start time for performance logging
         request.setAttribute("startTime", System.currentTimeMillis());
         return true;
     }

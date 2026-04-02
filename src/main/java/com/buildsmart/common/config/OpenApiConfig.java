@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    @Value("${app.docs.server.dev:http://localhost:8082}")
+    @Value("${app.docs.server.dev:http://localhost:8085}")
     private String devServer;
 
     @Value("${app.docs.server.prod:https://api.buildsmart.com}")

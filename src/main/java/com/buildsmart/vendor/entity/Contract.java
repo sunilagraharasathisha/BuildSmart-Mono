@@ -32,7 +32,7 @@ public class Contract {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(nullable = false, precision = 18, scale = 2)
+    @Column(name = "contract_value", nullable = false, precision = 18, scale = 2)
     private BigDecimal value;
 
     @Column(nullable = false, length = 30)

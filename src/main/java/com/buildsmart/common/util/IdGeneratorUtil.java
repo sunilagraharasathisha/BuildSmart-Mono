@@ -55,6 +55,11 @@ public final class IdGeneratorUtil {
         return String.format("INSBS%03d", next);
     }
 
+    public static String nextMilestoneId(String lastMilestoneId) {
+        int next = extractNumericSuffix(lastMilestoneId, 3) + 1;
+        return String.format("MILBS%03d", next);
+    }
+
     private static int extractNumericSuffix(String id, int digits) {
         if (id == null || id.length() < digits) {
             return 0;
